@@ -58,7 +58,6 @@ async def initialize_second_page(sb):
         sb.type("#ctl00_ContentPlaceHolder1_tbEMail", config['email'])
     sb.type("#ctl00_ContentPlaceHolder1_tbZipCD", config['postal_code'])
     sb.click("#ctl00_ContentPlaceHolder1_btnEstelamAddr")
-
     await client.send_message(config['telegram_username'], "Please provide the SMS code.")
     while sms_code is None:
         await asyncio.sleep(1)
