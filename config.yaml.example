@@ -1,0 +1,26 @@
+code_melli: "12345679"
+birth_day: "1"
+birth_month: "فروردین"
+birth_year: "1300"
+marry_day: "1"
+marry_month: "فروردین"
+marry_year: "1403"
+mobile_no: "09121234567"
+state: "تهران"
+isar: false
+sarbasi_status: "سایر"
+city: "تهران"
+code_melli_hamsar: "123456789"
+home_no: "02112345678"
+email: "your@email.com"
+postal_code: "123456789"
+proxy: null
+#  proxy_type: "http"
+#  addr: "127.0.0.1"
+#  port: "2081"
+session: 'telegram_session'
+api_id: 123456789
+api_hash: 'your_api_hash'
+bot_token: 'your_bot_token'
+telegram_user_id: 123456789
+telegram_username: "your_username"
