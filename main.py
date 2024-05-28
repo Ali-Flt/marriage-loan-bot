@@ -143,6 +143,7 @@ async def main():
                 while exception_occured == True:
                     await asyncio.sleep(1)
             try:
+                branch_idx = 1
                 sb.sleep(5)
                 reinitialize = True
                 while success == False and second_page == True:
@@ -179,7 +180,10 @@ async def main():
                     if captcha is not None and len(banks) > 1:
                         sb.select_option_by_text("#ctl00_ContentPlaceHolder1_ddlBankName", random.choice(banks[1:]))
                         branches = sb.get_select_options("#ctl00_ContentPlaceHolder1_lstBoxSuggShb")
-                        sb.select_option_by_text("#ctl00_ContentPlaceHolder1_lstBoxSuggShb", random.choice(branches[1:]))
+                        if branch_idx >= len(branches):
+                            branch_idx = 1
+                        sb.select_option_by_text("#ctl00_ContentPlaceHolder1_lstBoxSuggShb", branches[branch_idx])
+                        branch_idx = branch_idx + 1
                         sb.type("#ctl00_ContentPlaceHolder1_tbCaptcha1", str(captcha))
                         sb.find_element("#ctl00_ContentPlaceHolder1_btnSave").click()
                         try:
