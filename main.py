@@ -57,6 +57,7 @@ async def initialize_first_page(sb):
 
 async def initialize_second_page(sb):
     global sms_code
+    sb.refresh()
     if config['isar'] == False:
         sb.click("#ctl00_ContentPlaceHolder1_rbtnIsar0")
     else:
@@ -70,9 +71,10 @@ async def initialize_second_page(sb):
         sb.type("#ctl00_ContentPlaceHolder1_tbEMail", config['email'])
     sb.type("#ctl00_ContentPlaceHolder1_tbZipCD", config['postal_code'])
     sb.click("#ctl00_ContentPlaceHolder1_btnEstelamAddr")
-    await client.send_message(config['telegram_username'], "Please provide the SMS code.")
-    while sms_code is None:
-        await asyncio.sleep(1)
+    if sms_code is None:
+        await client.send_message(config['telegram_username'], "Please provide the SMS code.")
+        while sms_code is None:
+            await asyncio.sleep(1)
     sb.type("#ctl00_ContentPlaceHolder1_tbMobConfCode", sms_code)
 
 async def main():
@@ -121,10 +123,28 @@ async def main():
                         print("Unknown state. Reinitializing...")
                         reinitialize = True
                         second_page = False
-                
-                sb.sleep(5)
-                await initialize_second_page(sb)
+            except Exception:
+                success = False
+                exception_occured = True
+                second_page = False
+                sms_code = None
+                traceback.print_exc()
+                formatted_lines = traceback.format_exc().splitlines()
+                msg = ""
+                for line in formatted_lines:
+                    msg += line + '\n'
+                await client.send_message(config['telegram_username'], msg)
+                print(msg)
+                msg = "Exception in Page 1. Should I continue?\n"
+                msg += "/yes or /no"
+                await client.send_message(config['telegram_username'], msg)
+                while exception_occured == True:
+                    await asyncio.sleep(1)
+            try:
+                reinitialize = True
                 while success == False and second_page == True:
+                    if reinitialize == True:
+                        await initialize_second_page(sb)
                     captcha = None
                     while captcha is None:
                         sb.click("#ctl00_ContentPlaceHolder1_imgBtnCreateNewCaptcha2")
@@ -181,9 +201,6 @@ async def main():
                             print("Unknown state. Still staying in the second page.")
                             pdb.set_trace()
             except Exception:
-                second_page = False
-                reinitialize = True
-                sms_code = None
                 success = False
                 exception_occured = True
                 traceback.print_exc()
@@ -199,7 +216,5 @@ async def main():
                 while exception_occured == True:
                     await asyncio.sleep(1)
 
-
 with client:
     client.loop.run_until_complete(main())
-
