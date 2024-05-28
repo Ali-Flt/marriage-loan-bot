@@ -101,7 +101,6 @@ async def main():
                             reinitialize = True
                             second_page = False
                         sb.wait_for_and_accept_alert()
-                        sb.refresh()
                     except Exception:
                         print("Unknown state. Reinitializing...")
                         reinitialize = True
