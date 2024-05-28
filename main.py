@@ -143,8 +143,8 @@ async def main():
                     banks = sb.get_select_options("#ctl00_ContentPlaceHolder1_ddlBankName")
                     if captcha is not None and len(banks) > 1:
                         sb.select_option_by_text("#ctl00_ContentPlaceHolder1_ddlBankName", random.choice(banks[1:]))
-                        branches = sb.get_select_options("#ctl00_ContentPlaceHolder1_tbSuggShbSearch")
-                        sb.select_option_by_text("#ctl00_ContentPlaceHolder1_tbSuggShbSearch", random.choice(branches[1:]))
+                        branches = sb.get_select_options("#ctl00_ContentPlaceHolder1_lstBoxSuggShb")
+                        sb.select_option_by_text("#ctl00_ContentPlaceHolder1_lstBoxSuggShb", random.choice(branches[1:]))
                         sb.type("#ctl00_ContentPlaceHolder1_tbCaptcha1", str(captcha))
                         sb.find_element("#ctl00_ContentPlaceHolder1_btnSave").click()
                         try:
