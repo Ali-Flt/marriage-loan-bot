@@ -97,6 +97,10 @@ async def main():
                             second_page = True
                             print("Reached second page.")
                         else:
+                            msg = "Page 1 new alert:\n"
+                            msg += alert.text
+                            await client.send_message(config['telegram_username'], msg)
+                            print(msg)
                             print("Unknown state. Reinitializing...")
                             reinitialize = True
                             second_page = False
@@ -127,6 +131,10 @@ async def main():
                             print("Captcha failed.")
                             captcha = None
                         else:
+                            msg = "Page 2 step 1 new alert:\n"
+                            msg += alert.text
+                            await client.send_message(config['telegram_username'], msg)
+                            print(msg)
                             print("Unknown state. Still staying in the second page.")
                         sb.wait_for_and_accept_alert()
                     except Exception:
@@ -150,6 +158,10 @@ async def main():
                             elif alert.text == "لطفا نام بانک عامل را از ليست مربوطه انتخاب نماييد":
                                 print("Bank not selected.")
                             else:
+                                msg = "Page 2 step 2 new alert:\n"
+                                msg += alert.text
+                                await client.send_message(config['telegram_username'], msg)
+                                print(msg)
                                 print("Unknown state. Still staying in the second page.")
                                 pdb.set_trace()
                             sb.wait_for_and_accept_alert()
