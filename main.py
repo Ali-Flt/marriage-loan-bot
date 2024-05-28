@@ -17,6 +17,7 @@ proxy = None
 second_page = False
 sms_code = None
 success = False
+exception_occured = False
 if config['proxy']:
     proxy = config['proxy']
 
@@ -24,7 +25,18 @@ client = TelegramClient(config['session'], config['api_id'], config['api_hash'],
 
 @client.on(events.NewMessage(func=lambda e: e.sender_id == config['telegram_user_id'], incoming=True))
 async def handler_sms_code(event):
-    global second_page, sms_code
+    global second_page, sms_code, exception_occured
+    if exception_occured == True:
+        if event.message.text == '/yes':
+            exception_occured = False
+            event.respond("Resuming...")
+            return
+        elif event.message.text == '/no':
+            event.respond("Stopping the program.")
+            exit(0)
+        else:
+            event.respond("Invalid answer.")
+            return
     if second_page == True and sms_code is None:
         sms_code = event.message.text
         await event.respond("Thank you!")
@@ -64,7 +76,7 @@ async def initialize_second_page(sb):
     sb.type("#ctl00_ContentPlaceHolder1_tbMobConfCode", sms_code)
 
 async def main():
-    global sms_code, second_page, success
+    global sms_code, second_page, success, exception_occured
     with SB(headed=True) as sb:
         while True:
             try:
@@ -173,10 +185,17 @@ async def main():
                 reinitialize = True
                 sms_code = None
                 success = False
+                exception_occured = True
                 traceback.print_exc()
                 formatted_lines = traceback.format_exc().splitlines()
                 msg = formatted_lines[0] + '\n' + formatted_lines[-1]
+                await client.send_message(config['telegram_username'], msg)
                 print(msg)
+                msg = "Should I continue?\n"
+                msg += "/yes or /no"
+                await client.send_message(config['telegram_username'], msg)
+                while exception_occured == True:
+                    await asyncio.sleep(1)
 
 
 with client:
