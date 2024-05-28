@@ -57,7 +57,6 @@ async def initialize_first_page(sb):
 
 async def initialize_second_page(sb):
     global sms_code
-    sb.refresh()
     if config['isar'] == False:
         sb.click("#ctl00_ContentPlaceHolder1_rbtnIsar0")
     else:
