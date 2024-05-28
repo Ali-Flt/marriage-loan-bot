@@ -4,28 +4,11 @@ services:
       context: .
       dockerfile: Dockerfile
     working_dir: /app
+    ports:
+      - "5900:5900"
     volumes:
       - ./:/app
     shm_size: '2g'
     user: root
-
-  nginx:
-    restart: always
-    image: nginx:alpine
-    volumes:
-      - ./cert:/cert
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    ports:
-      - "81:80"
-      - "444:443"
-    depends_on:
-      - marriage_loan_bot
-    networks:
-      - marriage_loan_bot_network
-    links:
-      - marriage_loan_bot
-
-networks:
-  marriage_loan_bot_network:
-    driver: bridge
-    internal: false
+    environment:
+      - SE_VNC_PASSWORD=YourPassWord

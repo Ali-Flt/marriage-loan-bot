@@ -16,6 +16,7 @@ RUN --mount=type=cache,sharing=private,target=/var/cache/apt apt-get update \
         libgl1-mesa-glx \
         libsm6 \
         libxext6 \
+        xterm \
         python3 \
         python3-venv \
         pip \
