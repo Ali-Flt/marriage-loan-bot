@@ -29,13 +29,13 @@ async def handler_sms_code(event):
     if exception_occured == True:
         if event.message.text == '/yes':
             exception_occured = False
-            event.respond("Resuming...")
+            await event.respond("Resuming...")
             return
         elif event.message.text == '/no':
-            event.respond("Stopping the program.")
+            await event.respond("Stopping the program.")
             exit(0)
         else:
-            event.respond("Invalid answer.")
+            await event.respond("Invalid answer.")
             return
     if second_page == True and sms_code is None:
         sms_code = event.message.text
@@ -188,7 +188,9 @@ async def main():
                 exception_occured = True
                 traceback.print_exc()
                 formatted_lines = traceback.format_exc().splitlines()
-                msg = formatted_lines[0] + '\n' + formatted_lines[-1]
+                msg = ""
+                for line in formatted_lines:
+                    msg += line + '\n'
                 await client.send_message(config['telegram_username'], msg)
                 print(msg)
                 msg = "Should I continue?\n"
