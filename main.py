@@ -111,12 +111,12 @@ async def main():
                 while success == False and second_page == True:
                     captcha = None
                     while captcha is None:
-                        sb.click("#ctl00$ContentPlaceHolder1$imgBtnCreateNewCaptcha2")
+                        sb.click("#ctl00_ContentPlaceHolder1_imgBtnCreateNewCaptcha2")
                         with TemporaryDirectory() as tempdir:
                             sb.save_element_as_image_file("#ctl00_ContentPlaceHolder1_ImgCaptcha2", "captcha.png", folder=tempdir)
                             captcha = solve_persian_math_captcha(os.path.join(tempdir, "captcha.png"))
                     sb.type("#ctl00_ContentPlaceHolder1_tbCaptcha2", str(captcha))
-                    sb.find_element("#ctl00$ContentPlaceHolder1$btnBankListRefresh").click()
+                    sb.find_element("#ctl00_ContentPlaceHolder1_btnBankListRefresh").click()
                     try:
                         alert = sb.switch_to_alert()
                         if alert.text == "در حال حاضر هیچ بانکی در استان انتخابی شما دارای اعتبار نمی باشد، دوباره تلاش نمایید":
