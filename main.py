@@ -107,6 +107,8 @@ async def main():
                             print("Try again later.")
                         elif alert.text == "کد امنیتی وارد شده نامعتبر است !":
                             print("Captcha failed.")
+                        elif alert.text == "شماره تلفن همراه و شماره ملی با هم تطابق ندارند":
+                            print("Phone number and ID do not match.")
                         elif alert.text == "یک کد تایید 6 رقمی بر روی تلفن همراه شما ارسال گردید که در ادامه باید این کد را در کادر مربوطه وارد نمایید":
                             second_page = True
                             print("Reached second page.")
@@ -135,12 +137,13 @@ async def main():
                     msg += line + '\n'
                 await client.send_message(config['telegram_username'], msg)
                 print(msg)
-                msg = "Exception in Page 1. Should I continue?\n"
+                msg = "Exception on page 1. Should I continue?\n"
                 msg += "/yes or /no"
                 await client.send_message(config['telegram_username'], msg)
                 while exception_occured == True:
                     await asyncio.sleep(1)
             try:
+                sb.sleep(5)
                 reinitialize = True
                 while success == False and second_page == True:
                     if reinitialize == True:
@@ -210,7 +213,7 @@ async def main():
                     msg += line + '\n'
                 await client.send_message(config['telegram_username'], msg)
                 print(msg)
-                msg = "Should I continue?\n"
+                msg = "Exception on page 1. Should I continue?\n"
                 msg += "/yes or /no"
                 await client.send_message(config['telegram_username'], msg)
                 while exception_occured == True:
