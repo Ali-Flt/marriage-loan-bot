@@ -8,13 +8,13 @@ marry_year: "1403"
 mobile_no: "09121234567"
 state: "تهران"
 isar: false
-sarbasi_status: "سایر"
+sarbasi_status: "سایر" #put null if user gender is female
 city: "تهران"
 code_melli_hamsar: "123456789"
 home_no: "02112345678"
 email: "your@email.com"
 postal_code: "123456789"
-proxy: null
+proxy: null #remove null if proxy is needed for telegram
 #  proxy_type: "http"
 #  addr: "127.0.0.1"
 #  port: 2081
