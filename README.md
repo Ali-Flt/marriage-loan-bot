@@ -1,5 +1,9 @@
 # marriage-loan-bot (ربات وام ازدواج)
-A bot for getting marriage loan in Iran.
+A bot for signing up for a marriage loan in Iran.
+
+The code works for this website [https://ve.cbi.ir/TasRequest.aspx](https://ve.cbi.ir/TasRequest.aspx) that looks like this:
+![](media/first_page.png)
+![](media/second_page.png)
 
 # How to use:
 1. Install docker and docker-compose. (Look up tutorial elsewhere)
