@@ -206,7 +206,16 @@ async def main():
 
                     banks = sb.get_select_options("#ctl00_ContentPlaceHolder1_ddlBankName")
                     if captcha is not None and len(banks) > 1:
-                        sb.select_option_by_text("#ctl00_ContentPlaceHolder1_ddlBankName", random.choice(banks[1:]))
+                        # Temrorary code for not selecting Post bank
+                        if len(banks) == 2:
+                            if 'پست' in banks[1]:
+                                continue
+                            selected_bank = banks[1]
+                        else:
+                            selected_bank = random.choice(banks[1:])
+                            while 'پست' in selected_bank:
+                                selected_bank = random.choice(banks[1:])
+                        sb.select_option_by_text("#ctl00_ContentPlaceHolder1_ddlBankName", selected_bank)
                         sb.sleep(1)
                         try:
                             branches = sb.get_select_options("#ctl00_ContentPlaceHolder1_lstBoxSuggShb")
