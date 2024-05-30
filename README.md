@@ -2,7 +2,7 @@
 A bot for getting marriage loan in Iran.
 
 # How to use:
-1. Install docker and docker-compose.(Look up tutorial elsewhere)
+1. Install docker and docker-compose. (Look up tutorial elsewhere)
 2. Create a telegram bot. (Look up tutorial elsewhere)
 **Note:** The user has to send the sms code to the telegram bot when asked.
 3. Clone the repo: `git clone https://github.com/Ali-Flt/marriage-loan-bot.git && cd marriage-loan-bot`
