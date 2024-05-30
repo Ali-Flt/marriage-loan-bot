@@ -57,6 +57,12 @@ async def initialize_first_page(sb):
     sb.select_option_by_text("#ctl00_ContentPlaceHolder1_ddlMarryMonth", config['marry_month'])
     sb.type("#ctl00_ContentPlaceHolder1_tbMarrYear", config['marry_year'])
     sb.type("#ctl00_ContentPlaceHolder1_tbMobileNo", config['mobile_no'])
+    if config['phone_owner_code_melli_if_under_18'] is not None:
+        sb.type("#ctl00_ContentPlaceHolder1_tbIDNoOwnerMobile", config['phone_owner_code_melli_if_under_18'])
+    if config['foreigner_or_married_in_foreign_country'] == True:
+        sb.click("#ctl00_ContentPlaceHolder1_rbtnMarrKind2")
+    elif config['religious_minority'] == True:
+        sb.click("#ctl00_ContentPlaceHolder1_rbtnMarrKind3")
     sb.select_option_by_text("#ctl00_ContentPlaceHolder1_ddlState", config['state'])
 
 async def initialize_second_page(sb):
@@ -92,6 +98,9 @@ def print_user_config():
     msg += f"Marry Month: {config['marry_month']}\n"
     msg += f"Marry Year: {config['marry_year']}\n"
     msg += f"Mobile No.: {config['mobile_no']}\n"
+    msg += f"Phone owner if under 18 : {config['phone_owner_code_melli_if_under_18']}\n"
+    msg += f"Foreigner or married in foreign country: {config['foreigner_or_married_in_foreign_country']}\n"
+    msg += f"religious minority: {config['religious_minority']}\n"
     msg += f"State: {config['state']}\n"
     msg += f"Isar: {config['isar']}\n"
     msg += f"Sarbazi: {config['sarbasi_status']}\n"

@@ -6,6 +6,9 @@ marry_day: "1"
 marry_month: "فروردین"
 marry_year: "1403"
 mobile_no: "09121234567"
+phone_owner_code_melli_if_under_18: null
+foreigner_or_married_in_foreign_country: false
+religious_minority: false
 state: "تهران"
 isar: false
 sarbasi_status: "سایر" #put null if user gender is female.
