@@ -14,5 +14,7 @@ client = TelegramClient(config['session'], config['api_id'], config['api_hash'],
 
 if __name__ == '__main__':
     with client:
-        entity = client.get_entity(config['telegram_username'])
-    print(f"User ID: {entity.id}")
+        user = client.get_entity(config['telegram_user'])
+        admin = client.get_entity(config['telegram_admin'])
+    print(f"User ID: {user.id}")
+    print(f"Admin ID: {admin.id}")

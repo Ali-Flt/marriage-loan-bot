@@ -23,9 +23,9 @@ if config['proxy']:
 
 client = TelegramClient(config['session'], config['api_id'], config['api_hash'], proxy=proxy).start(bot_token=config['bot_token'])
 
-@client.on(events.NewMessage(func=lambda e: e.sender_id == config['telegram_user_id'], incoming=True))
-async def handler_sms_code(event):
-    global second_page, sms_code, exception_occured
+@client.on(events.NewMessage(func=lambda e: e.sender_id == config['telegram_admin_id'] , incoming=True))
+async def handler_admin(event):
+    global exception_occured
     if exception_occured == True:
         if event.message.text == '/yes':
             exception_occured = False
@@ -37,6 +37,10 @@ async def handler_sms_code(event):
         else:
             await event.respond("Invalid answer.")
             return
+
+@client.on(events.NewMessage(func=lambda e: e.sender_id == config['telegram_user_id'] , incoming=True))
+async def handler_user(event):
+    global second_page, sms_code
     if second_page == True and sms_code is None:
         sms_code = event.message.text
         await event.respond("Thank you!")
@@ -61,7 +65,8 @@ async def initialize_second_page(sb):
         sb.click("#ctl00_ContentPlaceHolder1_rbtnIsar0")
     else:
         sb.click("#ctl00_ContentPlaceHolder1_rbtnIsar1")
-    sb.select_option_by_text("#ctl00_ContentPlaceHolder1_ddlSarbasiST", config['sarbasi_status'])
+    if config['sarbasi_status'] is not None:
+        sb.select_option_by_text("#ctl00_ContentPlaceHolder1_ddlSarbasiST", config['sarbasi_status'])
     sb.select_option_by_text("#ctl00_ContentPlaceHolder1_ddlCity", config['city'])
     if config['code_melli_hamsar'] is not None:
         sb.type("#ctl00_ContentPlaceHolder1_tbIDNo2", config['code_melli_hamsar'])
@@ -71,20 +76,43 @@ async def initialize_second_page(sb):
     sb.type("#ctl00_ContentPlaceHolder1_tbZipCD", config['postal_code'])
     sb.click("#ctl00_ContentPlaceHolder1_btnEstelamAddr")
     if sms_code is None:
-        await client.send_message(config['telegram_username'], "Please provide the SMS code.")
+        await client.send_message(config['telegram_user'], "Please provide the SMS code.")
+        await client.send_message(config['telegram_admin'], "SMS sent to user.")
         while sms_code is None:
             await asyncio.sleep(1)
     sb.type("#ctl00_ContentPlaceHolder1_tbMobConfCode", sms_code)
 
+def print_user_config():
+    msg = ""
+    msg += f"Code Melli: {config['code_melli']}\n"
+    msg += f"Birth Day: {config['birth_day']}\n"
+    msg += f"Birth Month: {config['birth_month']}\n"
+    msg += f"Birth Year: {config['birth_year']}\n"
+    msg += f"Marry Day: {config['marry_day']}\n"
+    msg += f"Marry Month: {config['marry_month']}\n"
+    msg += f"Marry Year: {config['marry_year']}\n"
+    msg += f"Mobile No.: {config['mobile_no']}\n"
+    msg += f"State: {config['state']}\n"
+    msg += f"Isar: {config['isar']}\n"
+    msg += f"Sarbazi: {config['sarbasi_status']}\n"
+    msg += f"City: {config['city']}\n"
+    msg += f"Code Melli Hamsar: {config['code_melli_hamsar']}\n"
+    msg += f"Home No.: {config['home_no']}\n"
+    msg += f"Email: {config['email']}\n"
+    msg += f"Postal Code: {config['postal_code']}\n"
+    return msg
+
 async def main():
     global sms_code, second_page, success, exception_occured
     with SB(headed=True) as sb:
+        msg = "Bot started working with this information:\n"
+        msg += print_user_config()
+        await client.send_message(config['telegram_admin'], msg)
         while True:
             try:
                 reinitialize = True
                 while second_page == False:
                     if reinitialize:
-                        await asyncio.sleep(1)
                         await initialize_first_page(sb)
                         reinitialize = False
                     captcha = None
@@ -114,7 +142,7 @@ async def main():
                         else:
                             msg = "Page 1 new alert:\n"
                             msg += alert.text
-                            await client.send_message(config['telegram_username'], msg)
+                            await client.send_message(config['telegram_admin'], msg)
                             print(msg)
                             print("Unknown state. Reinitializing...")
                             reinitialize = True
@@ -134,11 +162,11 @@ async def main():
                 msg = ""
                 for line in formatted_lines:
                     msg += line + '\n'
-                await client.send_message(config['telegram_username'], msg)
+                await client.send_message(config['telegram_admin'], msg)
                 print(msg)
                 msg = "Exception on page 1. Should I continue?\n"
                 msg += "/yes or /no"
-                await client.send_message(config['telegram_username'], msg)
+                await client.send_message(config['telegram_admin'], msg)
                 while exception_occured == True:
                     await asyncio.sleep(1)
             try:
@@ -148,6 +176,7 @@ async def main():
                 while success == False and second_page == True:
                     if reinitialize == True:
                         await initialize_second_page(sb)
+                        reinitialize = False
                     captcha = None
                     while captcha is None:
                         sb.click("#ctl00_ContentPlaceHolder1_imgBtnCreateNewCaptcha2")
@@ -168,7 +197,7 @@ async def main():
                         else:
                             msg = "Page 2 step 1 new alert:\n"
                             msg += alert.text
-                            await client.send_message(config['telegram_username'], msg)
+                            await client.send_message(config['telegram_admin'], msg)
                             print(msg)
                             print("Unknown state. Still staying in the second page.")
                         sb.wait_for_and_accept_alert()
@@ -178,7 +207,12 @@ async def main():
                     banks = sb.get_select_options("#ctl00_ContentPlaceHolder1_ddlBankName")
                     if captcha is not None and len(banks) > 1:
                         sb.select_option_by_text("#ctl00_ContentPlaceHolder1_ddlBankName", random.choice(banks[1:]))
-                        branches = sb.get_select_options("#ctl00_ContentPlaceHolder1_lstBoxSuggShb")
+                        sb.sleep(1)
+                        try:
+                            branches = sb.get_select_options("#ctl00_ContentPlaceHolder1_lstBoxSuggShb")
+                        except Exception:
+                            sb.sleep(2)
+                            branches = sb.get_select_options("#ctl00_ContentPlaceHolder1_lstBoxSuggShb")
                         if branch_idx >= len(branches):
                             branch_idx = 1
                         sb.select_option_by_text("#ctl00_ContentPlaceHolder1_lstBoxSuggShb", branches[branch_idx])
@@ -198,7 +232,7 @@ async def main():
                             else:
                                 msg = "Page 2 step 2 new alert:\n"
                                 msg += alert.text
-                                await client.send_message(config['telegram_username'], msg)
+                                await client.send_message(config['telegram_admin'], msg)
                                 print(msg)
                                 print("Unknown state. Still staying in the second page.")
                                 pdb.set_trace()
@@ -214,11 +248,11 @@ async def main():
                 msg = ""
                 for line in formatted_lines:
                     msg += line + '\n'
-                await client.send_message(config['telegram_username'], msg)
+                await client.send_message(config['telegram_admin'], msg)
                 print(msg)
                 msg = "Exception on page 1. Should I continue?\n"
                 msg += "/yes or /no"
-                await client.send_message(config['telegram_username'], msg)
+                await client.send_message(config['telegram_admin'], msg)
                 while exception_occured == True:
                     await asyncio.sleep(1)
 

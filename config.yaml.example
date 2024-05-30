@@ -23,4 +23,6 @@ api_id: 123456789
 api_hash: 'your_api_hash'
 bot_token: 'your_bot_token'
 telegram_user_id: 123456789
-telegram_username: "your_username"
+telegram_user: "user_telegram_username"
+telegram_admin_id: 123456789
+telegram_admin: "admin_telegram_username"
