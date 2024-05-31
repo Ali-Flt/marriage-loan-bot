@@ -5,7 +5,6 @@ import os
 from datetime import datetime, timedelta
 from seleniumbase import SB
 from telethon import TelegramClient, events
-import pdb
 import asyncio
 import traceback
 
@@ -120,7 +119,7 @@ async def main():
         msg = "Bot started working with this information:\n"
         msg += print_user_config()
         await client.send_message(config['telegram_admin'], msg)
-        while True:
+        while success == False:
             try:
                 reinitialize = True
                 while second_page == False:
@@ -157,12 +156,11 @@ async def main():
                             msg += alert.text
                             await client.send_message(config['telegram_admin'], msg)
                             print(msg)
-                            print("Unknown state. Reinitializing...")
                             reinitialize = True
                             second_page = False
                         sb.wait_for_and_accept_alert()
                     except Exception:
-                        print("Unknown state. Reinitializing...")
+                        print("No alert given when expected (First page)")
                         reinitialize = True
                         second_page = False
             except Exception:
@@ -183,7 +181,7 @@ async def main():
                 while exception_occured == True:
                     await asyncio.sleep(1)
             try:
-                branch_idx = 1
+                bank_idxes = {}
                 sb.sleep(5)
                 reinitialize = True
                 second_page_start_timestamp = datetime.now()
@@ -217,22 +215,15 @@ async def main():
                             msg += alert.text
                             await client.send_message(config['telegram_admin'], msg)
                             print(msg)
-                            print("Unknown state. Still staying in the second page.")
                         sb.wait_for_and_accept_alert()
                     except Exception:
-                        print("Unknown state. Still staying in the second page.")
+                        print("No alert given when expected (Second page step 1)")
 
-                    banks = sb.get_select_options("#ctl00_ContentPlaceHolder1_ddlBankName")
-                    if captcha is not None and len(banks) > 1:
-                        # Temrorary code for not selecting Post bank
-                        if len(banks) == 2:
-                            if 'پست' in banks[1]:
-                                continue
-                            selected_bank = banks[1]
-                        else:
-                            selected_bank = random.choice(banks[1:])
-                            while 'پست' in selected_bank:
-                                selected_bank = random.choice(banks[1:])
+                    available_banks = sb.get_select_options("#ctl00_ContentPlaceHolder1_ddlBankName")
+                    if captcha is not None and len(available_banks) > 1:
+                        selected_bank = random.choice(available_banks[1:])
+                        if selected_bank not in bank_idxes:
+                            bank_idxes[selected_bank] = 1
                         sb.select_option_by_text("#ctl00_ContentPlaceHolder1_ddlBankName", selected_bank)
                         sb.sleep(1)
                         try:
@@ -240,10 +231,10 @@ async def main():
                         except Exception:
                             sb.sleep(2)
                             branches = sb.get_select_options("#ctl00_ContentPlaceHolder1_lstBoxSuggShb")
-                        if branch_idx >= len(branches):
-                            branch_idx = 1
-                        sb.select_option_by_text("#ctl00_ContentPlaceHolder1_lstBoxSuggShb", branches[branch_idx])
-                        branch_idx = branch_idx + 1
+                        if bank_idxes[selected_bank] >= len(branches):
+                            bank_idxes[selected_bank] = 1
+                        sb.select_option_by_text("#ctl00_ContentPlaceHolder1_lstBoxSuggShb", branches[bank_idxes[selected_bank]])
+                        bank_idxes[selected_bank] = bank_idxes[selected_bank] + 1
                         sb.type("#ctl00_ContentPlaceHolder1_tbCaptcha1", str(captcha))
                         sb.find_element("#ctl00_ContentPlaceHolder1_btnSave").click()
                         try:
@@ -261,12 +252,14 @@ async def main():
                                 msg += alert.text
                                 await client.send_message(config['telegram_admin'], msg)
                                 print(msg)
-                                print("Unknown state. Still staying in the second page.")
-                                pdb.set_trace()
                             sb.wait_for_and_accept_alert()
                         except Exception:
-                            print("Unknown state. Still staying in the second page.")
-                            pdb.set_trace()
+                            try:
+                                sb.assert_text("رسید ثبت نام")
+                                print("Loan sign up was successful.")
+                                success = True
+                            except Exception:
+                                print("No alert given when expected (Second page step 2)")
             except Exception:
                 success = False
                 exception_occured = True

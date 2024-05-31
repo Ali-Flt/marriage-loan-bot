@@ -36,4 +36,4 @@ Consider buying me a coffee if this helped you.
 
 ## Stargazers over Time
 
-[![Stargazers over time](https://starchart.cc/Ali-Flt/XXX.svg?variant=adaptive)](https://starchart.cc/Ali-Flt/XXX)
+[![Stargazers over time](https://starchart.cc/Ali-Flt/marriage-loan-bot.svg?variant=adaptive)](https://starchart.cc/Ali-Flt/marriage-loan-bot)
