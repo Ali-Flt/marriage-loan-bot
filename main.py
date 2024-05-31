@@ -2,12 +2,14 @@ import random
 import yaml
 from tempfile import TemporaryDirectory
 import os
-from src.captcha import solve_persian_math_captcha
+from datetime import datetime, timedelta
 from seleniumbase import SB
 from telethon import TelegramClient, events
 import pdb
 import asyncio
 import traceback
+
+from src.captcha import solve_persian_math_captcha
 
 config = {}
 with open("config.yaml") as f:
@@ -86,6 +88,7 @@ async def initialize_second_page(sb):
         await client.send_message(config['telegram_admin'], "SMS sent to user.")
         while sms_code is None:
             await asyncio.sleep(1)
+        await client.send_message(config['telegram_admin'], "SMS code received from user.")
     sb.type("#ctl00_ContentPlaceHolder1_tbMobConfCode", sms_code)
 
 def print_user_config():
@@ -124,6 +127,7 @@ async def main():
                     if reinitialize:
                         await initialize_first_page(sb)
                         reinitialize = False
+                        sms_code = None
                     captcha = None
                     while captcha is None:
                         sb.click("#ctl00_ContentPlaceHolder1_imgBtnCreateNewCaptcha")
@@ -182,7 +186,12 @@ async def main():
                 branch_idx = 1
                 sb.sleep(5)
                 reinitialize = True
+                second_page_start_timestamp = datetime.now()
                 while success == False and second_page == True:
+                    if datetime.now() - second_page_start_timestamp > timedelta(minutes=10):
+                        second_page = False
+                        print("10 minutes is up. Going back to the first page.")
+                        continue
                     if reinitialize == True:
                         await initialize_second_page(sb)
                         reinitialize = False
